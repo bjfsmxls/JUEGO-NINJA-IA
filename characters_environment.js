@@ -3,10 +3,10 @@
 =            Variables            =
 =================================*/
 
-/* main character variabes */
+/* Variables del personaje principal */
 var ninja, bricks,clouds,mountains,enemyMushrooms,pipes,platforms,coins;
 
-/* Control variabes */
+/* Variables de control */
 var control={
   up: "UP_ARROW", // 32=spaceBar
   left: 'LEFT_ARROW',
@@ -14,43 +14,43 @@ var control={
   revive: 32
 }
 
-//Inner game status, which might affect game balance or playability.
+//Estado interno del juego, que podría afectar al equilibrio del juego o a la jugabilidad.
 var gameConfig={
   
-  // start, playing, over
+  // empezar, jugar, perder
   status: "start", 
   
-  // initial lives of ninja
+  // vidas iniciales del ninja
   initialLifes: 4,
 
-  // character moves speed
+  // velocidad de los movimientos del personaje
   moveSpeed: 5,
   enemyMoveSpeed: 1,
 
-  // gravity and jump speed for all the characters
+  // gravedad y velocidad de salto para todos los personajes
   gravity: 1,
   gravityEnemy: 10,
   jump:-15,
 
-  // character starting point
+  // punto de partida del personaje
   startingPointX: 500,
   startingPointY: 0,
 
-  // default canvas size
+  // tamaño del lienzo por defecto
   screenX:1240,
   screenY:336,
 
-  // scores
+  // puntajes
   timeScores: 0,
   scores: 0
 }
 
 
-/*=====  End of Variables  ======*/
+/*=====  Fin de las variables  ======*/
 
 
 /*====================================
-=            Game Status             =
+=        Estatus del jeugo           =
 ====================================*/
 noseX = "";
 noseY = "";
@@ -91,7 +91,7 @@ function game(){
   
   }
 
-    // if game is over 
+    // si el juego se termina 
   if(gameConfig.status==='gameover'){
     
     fill(0,0,0,150);
@@ -121,7 +121,7 @@ function startGame()
   document.getElementById("status").innerHTML = "Game Is Loading";
 }
 
-// change game status if any key is pressed
+// cambiar el estado del juego si se pulsa cualquier tecla
 function changeGameStatud(character){
  if(noseX !="" && gameConfig.status==="start" && GameStatus=="start") { 
    document.getElementById("status").innerHTML = "Game Is Loaded";
@@ -137,14 +137,14 @@ function changeGameStatud(character){
 
 
 
-/*=====  End of Game Status   ======*/
+/*=====  Fin del estatus del juego   ======*/
 
 
 /*=============================================
-=                 Instialize                  =
+=                 Inicializar                  =
 =============================================*/
 
-//initialize
+//inicializar
 function instializeInSetup(character){
 	frameRate(120);
 	
@@ -158,16 +158,16 @@ function instializeInSetup(character){
 	coins.collide(pipes);
 	coins.displace(bricks);		
 
-  // change the scale of clouds
+  // cambiar la escala de las nubes
 	clouds.forEach(function(element){
 		element.scale=random(1,2);
 	})
 }
 
 function initializeCharacterStatus(character){
-  // set up the initial config of character  
+  // establecer la configuración inicial del personaje  
   character.scale=0.35;
-  character["killing"]=0; //while is killing enemy
+  character["killing"]=0; //mientras mata al enemigo
   character["kills"]=0;
   character["live"]=true;
   character["liveNumber"]=gameConfig.initialLifes;
@@ -181,20 +181,20 @@ function initializeCharacterStatus(character){
 function instializeInDraw(){
   background(109,143,252);
   
-  //while killing
+  //mientras mata
   if(ninja.killing>0){
     ninja.killing-=1;
   }else{
     ninja.killing=0;
   }
   
-  // make objects not overlap each other.
+  // hacer que los objetos no se superpongan entre sí.
   pipes.displace(pipes);
   enemyMushrooms.displace(enemyMushrooms);
   enemyMushrooms.collide(pipes);
   clouds.displace(clouds);
 
-  // make character not overlap other objects
+  // hacer que el personaje no se superponga a otros objetos
   if(ninja.live){
     bricks.displace(ninja);
     pipes.displace(ninja);
@@ -209,15 +209,15 @@ function instializeInDraw(){
 
 }
 
-/*=====       End of Instialize        ======*/
+/*=====       Fin de la inicialización        ======*/
 
 
 
 /*============================================
-=            Interactive Elements            =
+=           Elementos interactivos           =
 ============================================*/
 
-// Character get coins
+// El personaje obtiene monedas
 function getCoins(coin,character){
   if( character.overlap(coin) && character.live && coin.get==false){
     character.coins+=1;
@@ -226,7 +226,7 @@ function getCoins(coin,character){
   };
 }
     
-// Reappear coin after goin is got.
+// Reaparece la moneda después de conseguir el goin.
 function coinVanish(coin){
   if(coin.get){
     coin.position.x=random(50,gameConfig.screenX)+gameConfig.screenX;
@@ -234,58 +234,58 @@ function coinVanish(coin){
   };
 }
 
-/*=====  End of Interactive Elements  ======*/
+/*=====  Fin de los elementos interactivos  ======*/
 
 
-/*=============================================
-=    Main character setting and control       =
-=============================================*/
+/*==========================================================
+=    Configuración y control del personaje principal       =
+===========================================================*/
 
-/* Make main character standing on objs */
+/* Hacer que el personaje principal esté de pie sobre los objetos */
 function positionOfCharacter(character){
   
-  // Not on the platform
+  // No en la plataforma
   if(character.live){
     
-    // See if standing on bricks
+    // Ver si al estar de pie en los ladrillos
     platforms.forEach(function(element){ standOnObjs(character,element); });
     bricks.forEach(function(element){ standOnObjs(character,element); });
     pipes.forEach(function(element){ standOnObjs(character,element); });
     
-    // Character affected by gravity
+    // Personaje afectado por la gravedad
     falling(character);
 
-    // If character can only jump if standing on the object
+    // Si el personaje sólo puede saltar si está sobre el objeto
     if(character.standOnObj) jumping(character);
       
   }
 
-  // Coins interaction event
+  // Evento de interacción con las monedas
   coins.forEach(function(element){
     getCoins(element,ninja);
     coinVanish(element);
   });
 
-  // EnemyMushrooms interaction event
+  // Evento de interacción EnemyMushrooms
   enemyMushrooms.forEach(function(element){
     StepOnEnemy(character,element);
     if((element.touching.left||element.touching.right)&&character.live&&character.killing===0) die(ninja);
     
   })
 
-  // Make it stay in the screen
+  // Hacer que se quede en la pantalla
   dontGetOutOfScreen(ninja);
 
 }
 
-/* Auto moving character  */
+/* Personaje en movimiento automático  */
 function autoControl(character){
     character.velocity.x+=gameConfig.moveSpeed;
     character.changeAnimation('move');
     character.mirrorX(1);
 }
 
-/* Manual control character */
+/* Personaje de control manual */
 function manualControl(character){
   
   if(character.live){
@@ -308,7 +308,7 @@ function manualControl(character){
  
 }
 
-/* Movements of character */
+/* Movimientos del personaje */
 function jumping(character){
 	if( (noseY < 168  &&character.live) || (touchIsDown&&character.live) ){
     character.velocity.y+=gameConfig.jump;
@@ -317,14 +317,14 @@ function jumping(character){
 }
 
 
-/* Movements of character */
+/* Movimientos del personaje */
 function falling(character){
 	character.velocity.y += gameConfig.gravity;
   character.changeAnimation('jump');
 }
 
 
-/* See if  obj1 stand on obj2, mainly for see if standing on the objcs*/
+/* Ver si obj1 se para sobre obj2, principalmente para ver si se para sobre los objcs */
 function standOnObjs(obj1,obj2){
   
 	var obj1_Left=leftSide(obj1);
@@ -338,14 +338,14 @@ function standOnObjs(obj1,obj2){
 	var obj2_Down=downSide(obj2);
 
 	if(obj1_Right>=obj2_Left&&obj1_Left<=obj2_Right && obj1_Down<=obj2_Up+7 && obj1_Down>=obj2_Up-7){
-		// println("YES");
+		// println("SI");
 		obj1.velocity.y = 0;
 		obj1.position.y=obj2_Up-(obj1.height/2)-1;
 		obj1.standOnObj= true;
 	}
 }
 
-/* See if  obj1 step on obj2 to kill it*/
+/* Ver si obj1 pisa a obj2 para matarlo */
 function StepOnEnemy(obj1,obj2){
   
 	var obj1_Left=leftSide(obj1);
@@ -372,7 +372,7 @@ function StepOnEnemy(obj1,obj2){
 }
 
 
-// make character die if he touched by enemy
+// hacer que el personaje muera si es tocado por el enemigo
 function die(character){
     character.live=false;
     character.dying+=120;
@@ -387,7 +387,7 @@ function die(character){
     }
 }
 
-// check character status and response to sprite and game status
+// comprobar el estado del personaje y la respuesta al sprite y al estado del juego
 function checkStatus(character){    
   if(character.live==false){
     character.changeAnimation('dead');
@@ -401,7 +401,7 @@ function checkStatus(character){
 
 }
 
-// revive after dying music finished
+// revivir después de morir la música terminó
 function reviveAfterMusic(character){
   if( character.live === false && ninja.liveNumber !==0 && character.dying===0 ){
     character.live=true;
@@ -413,10 +413,10 @@ function reviveAfterMusic(character){
 }
 
 
-/* Make character stay in screen */
+/* Hacer que el personaje permanezca en la pantalla */
 function dontGetOutOfScreen(character){
   
-  //if ninja drop in the holes 
+  //si el ninja cae en los agujeros 
   if(character.position.y>gameConfig.screenY&&character.live && character==ninja){
     die(ninja);
   }
@@ -433,11 +433,11 @@ function dontGetOutOfScreen(character){
 
 }
 
-/*=====  End of main character setting and control ======*/
+/*=====  Fin de la configuración y el control del personaje principal ======*/
 
 
 /*=============================================
-=          Enemy setting and control          =
+=  Configuración y control de los enemigos   =
 =============================================*/
 
 
@@ -449,7 +449,7 @@ function enemys(enemys){
   });
 } 
 
-// Check enemy status
+// Comprobar el estado de los enemigos
 function stateOfEnemy(enemy){
   if (enemy.live==false||enemy.position.y>gameConfig.screenY+50){
     enemy.position.x=random(gameConfig.screenX*1.5,2*gameConfig.screenX+50);
@@ -458,7 +458,7 @@ function stateOfEnemy(enemy){
   }
 }
 
-/* Make enemy standing on objs */
+/* Hacer que el enemigo se pare en los objetos */
 function positionOfEnemy(enemy){
 
 	platforms.forEach(function(element){ enemyStandOnObjs(enemy, element); });
@@ -471,7 +471,7 @@ function positionOfEnemy(enemy){
 }
 
 
-/* See if  obj1 stand on obj2, mainly for see if standing on the objcs*/
+/* Ver si obj1 se para sobre obj2, principalmente para ver si se para sobre el objcs */
 function enemyStandOnObjs(obj1,obj2){
   
   var obj1_Left=leftSide(obj1);
@@ -485,7 +485,7 @@ function enemyStandOnObjs(obj1,obj2){
   var obj2_Down=downSide(obj2);
 
   if(obj1_Right>=obj2_Left&&obj1_Left<=obj2_Right && obj1_Down<=obj2_Up+7 && obj1_Down>=obj2_Up-7){
-    // println("YES");
+    // println("SI");
     obj1.velocity.y = 0;
     obj1.position.y=obj2_Up-(obj1.height);
   }
@@ -493,14 +493,14 @@ function enemyStandOnObjs(obj1,obj2){
 
 
 
-/*=====  End of enemy setting and control ======*/
+/*=====  Fin del ajuste y control del enemigo ======*/
 
 
 /*===================================
-=            Environment            =
+=            Entorno            =
 ===================================*/
 
-// call all environment scroll functions 
+// llamar a todas las funciones de desplazamiento del entorno 
 function moveEnvironment(character){
   var environmentScrollingSpeed=gameConfig.moveSpeed*0.3; 
   
@@ -516,7 +516,7 @@ function moveEnvironment(character){
   }
 }
 
-// scroll different element in the screen
+// desplazar diferentes elementos en la pantalla
 function environmentScrolling(group,environmentScrollingSpeed){
   group.forEach(function(element){
     if(element.position.x>-50){
@@ -524,17 +524,17 @@ function environmentScrolling(group,environmentScrollingSpeed){
     }else{
       element.position.x=gameConfig.screenX+50;
       
-      //if group is bricks, randomize its y position
+      //si el grupo es de bloques, aleatorizar su posición y
       if(group===bricks){
         element.position.y=random(gameConfig.screenY*0.35,gameConfig.screenY*0.75);
       }
 
-      //if group is bricks or mountains, randomize its x position
+      //si el grupo es de bloques o montañas, aleatoriza su posición x
       if(group===pipes||group===mountains){
         element.position.x=random(50,gameConfig.screenX)+gameConfig.screenX;
       }
 
-      //if group is clouds, randomize its x & y position
+      //si el grupo está nublado, aleatorizar su posición x e y
       if(group===clouds){
         element.position.x=random(50,gameConfig.screenX)+gameConfig.screenX;
         element.position.y=random(0,gameConfig.screenY*0.5);
@@ -551,21 +551,21 @@ function environmentScrolling(group,environmentScrollingSpeed){
   })
 }
 
-/*=====  End of Environment  ======*/
+/*=====  Fin del entorno  ======*/
 
 
 /*=====================================
-=            For Debugging            =
+=            Para Depurar            =
 =====================================*/
 
-/* for position state of character */
+/* para el estado de posición del personaje */
 function debugging(character){
 	strokeWeight(1);
 	fill(255);
 	textSize(12);
   text(character.dying, 20,20);
 	text(gameConfig.status, 20,80);
-	// text("v: "+character.velocity.y,150,20);
+	// texto("v: "+character.velocity.y,150,20);
 	noFill();
 	// outline(tube01);
 	stroke(251);
@@ -578,7 +578,7 @@ function debugging(character){
 }
 
 
-// calculate scores of every game
+// calcular los resultados de cada juego
 function scores(character){
 
   strokeWeight(0);
@@ -619,15 +619,15 @@ function scores(character){
 
 }
 
-/* make outline of obj*/
+/* hacer el contorno del objeto */
 function outline(obj){ rect(leftSide(obj),upSide(obj),rightSide(obj)-leftSide(obj),downSide(obj)-upSide(obj));}
 
-/* get each side position of obj*/
+/* obtener la posición de cada lado del objeto */
 function leftSide(obj){ return obj.position.x-(obj.width/2);}
 function rightSide(obj){ return obj.position.x+(obj.width/2);}
 function upSide(obj){ return obj.position.y-(obj.height/2);}
 function downSide(obj){ return obj.position.y+(obj.height/2);}
 
-/*=====  End of For Debugging  ======*/
+/*=====  Fin de Para la depuración  ======*/
 
 
